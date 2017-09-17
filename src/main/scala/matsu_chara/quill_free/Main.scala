@@ -15,9 +15,9 @@ object Main extends StrictLogging {
     import roleDbMaster._
     try {
       normal()
-      free()
-      freeRoleMaster()
-      freeRoleSlave()
+      io()
+      ioRoleMaster()
+      ioRoleSlave()
     } finally {
       roleDbMaster.close()
       roleDbSlave.close()
@@ -33,32 +33,32 @@ object Main extends StrictLogging {
     logger.info(s"normal result = $personOpt")
   }
 
-  def free()(implicit ctx: MyDbContext): Unit = {
+  def io()(implicit ctx: MyDbContext): Unit = {
     val personFreeRepository = new PersonFreeRepository
 
-    val freeOp = for {
+    val ioOp = for {
       _ <- personFreeRepository.deleteAll()
       _ <- personFreeRepository.insert(Person(id = 1, state = 0))
       p <- personFreeRepository.findById(1)
     } yield p
-    val personOpt = ctx.performIO(freeOp.transactional)
-    logger.info(s"free result = $personOpt")
+    val personOpt = ctx.performIO(ioOp.transactional)
+    logger.info(s"io result = $personOpt")
   }
 
-  def freeRoleMaster()(implicit roleDb: RoleDb[Master]): Unit = {
+  def ioRoleMaster()(implicit roleDb: RoleDb[Master]): Unit = {
     import roleDb._
 
     val personFreeRepository = new PersonFreeRepository
-    val freeOp = for {
+    val ioOp = for {
       _ <- personFreeRepository.deleteAll()
       _ <- personFreeRepository.insert(Person(id = 1, state = 0))
       p <- personFreeRepository.findById(1)
     } yield p
-    val personOpt = roleDb.roleBasedPerformIO(freeOp.transactional)
-    logger.info(s"freeRole result = $personOpt")
+    val personOpt = roleDb.roleBasedPerformIO(ioOp.transactional)
+    logger.info(s"ioRole result = $personOpt")
   }
 
-  def freeRoleSlave()(implicit roleDb: RoleDb[Slave]): Unit = {
+  def ioRoleSlave()(implicit roleDb: RoleDb[Slave]): Unit = {
     import roleDb._
 
     val personFreeRepository = new PersonFreeRepository
@@ -75,7 +75,7 @@ object Main extends StrictLogging {
     } yield p
     val personOpt = roleDb.roleBasedPerformIO(canCompileOp)
 
-    logger.info(s"freeRole result = $personOpt")
+    logger.info(s"ioRole result = $personOpt")
   }
 
 }
