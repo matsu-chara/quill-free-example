@@ -1,4 +1,4 @@
-package matsu_chara.quill.free.quill
+package matsu_chara.quill_free.quill
 
 import io.getquill.{MysqlEscape, MysqlJdbcContext, SnakeCase}
 

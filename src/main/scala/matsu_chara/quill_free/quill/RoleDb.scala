@@ -1,7 +1,7 @@
-package matsu_chara.quill.free.quill
+package matsu_chara.quill_free.quill
 
 import io.getquill.monad.Effect
-import matsu_chara.quill.free.quill.RoleDb.{Role, RoleCheck}
+import RoleDb.{Role, RoleCheck}
 
 class RoleDb[R <: Role](configPrefix: String) {
   implicit val ctx: MyDbContext = new MyDbContext

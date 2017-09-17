@@ -1,9 +1,9 @@
-package matsu_chara.quill.free
+package matsu_chara.quill_free
 
 import com.typesafe.scalalogging.StrictLogging
-import matsu_chara.quill.free.quill.RoleDb.{Master, Slave}
-import matsu_chara.quill.free.quill.{MyDbContext, RoleDb}
-import matsu_chara.quill.free.repo.{PersonFreeRepository, PersonRepository}
+import matsu_chara.quill_free.quill.RoleDb.{Master, Slave}
+import matsu_chara.quill_free.quill.{MyDbContext, RoleDb}
+import matsu_chara.quill_free.repo.{PersonFreeRepository, PersonRepository}
 
 object Main extends StrictLogging {
   val personRepository = new PersonRepository

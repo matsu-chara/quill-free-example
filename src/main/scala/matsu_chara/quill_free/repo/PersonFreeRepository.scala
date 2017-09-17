@@ -1,8 +1,8 @@
-package matsu_chara.quill.free.repo
+package matsu_chara.quill_free.repo
 
 import io.getquill.monad.Effect
-import matsu_chara.quill.free.Person
-import matsu_chara.quill.free.quill.MyDbContext
+import matsu_chara.quill_free.Person
+import matsu_chara.quill_free.quill.MyDbContext
 
 class PersonFreeRepository {
 
