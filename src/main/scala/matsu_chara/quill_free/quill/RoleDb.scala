@@ -20,7 +20,7 @@ object RoleDb {
   trait Master extends Role
   trait Slave extends Role
 
-  trait RoleCheck[D <: Role, +E <: Effect]
+  trait RoleCheck[D <: Role, E <: Effect]
   implicit val slaveRead: RoleCheck[Slave, Effect.Read] = null
   implicit val masterRead: RoleCheck[Master, Effect.Read] = null
   implicit val masterWrite: RoleCheck[Master, Effect.Write] = null
