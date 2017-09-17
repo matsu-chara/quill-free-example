@@ -1,24 +1,30 @@
 package matsu_chara.quill.free
 
 import com.typesafe.scalalogging.StrictLogging
-import io.getquill.{MysqlJdbcContext, SnakeCase}
+import matsu_chara.quill.free.quill.RoleDb.{Master, Slave}
+import matsu_chara.quill.free.quill.{MyDbContext, RoleDb}
 import matsu_chara.quill.free.repo.{PersonFreeRepository, PersonRepository}
 
 object Main extends StrictLogging {
   val personRepository = new PersonRepository
 
   def main(args: Array[String]): Unit = {
-    implicit val ctx: MysqlJdbcContext[SnakeCase] = new MysqlJdbcContext[SnakeCase]("ctx")
+    implicit val roleDbMaster: RoleDb[RoleDb.Master] = new RoleDb[RoleDb.Master]("ctx")
+    implicit val roleDbSlave: RoleDb[RoleDb.Slave] = new RoleDb[RoleDb.Slave]("ctx")
 
+    import roleDbMaster._
     try {
       normal()
       free()
+      freeRoleMaster()
+      freeRoleSlave()
     } finally {
-      ctx.close()
+      roleDbMaster.close()
+      roleDbSlave.close()
     }
   }
 
-  def normal()(implicit ctx: MysqlJdbcContext[SnakeCase]): Unit = {
+  def normal()(implicit ctx: MyDbContext): Unit = {
     val personOpt = ctx.transaction {
       personRepository.deleteAll()
       personRepository.insert(Person(id = 1, state = 0))
@@ -27,7 +33,7 @@ object Main extends StrictLogging {
     logger.info(s"normal result = $personOpt")
   }
 
-  def free()(implicit ctx: MysqlJdbcContext[SnakeCase]): Unit = {
+  def free()(implicit ctx: MyDbContext): Unit = {
     val personFreeRepository = new PersonFreeRepository
 
     val freeOp = for {
@@ -38,4 +44,38 @@ object Main extends StrictLogging {
     val personOpt = ctx.performIO(freeOp.transactional)
     logger.info(s"free result = $personOpt")
   }
+
+  def freeRoleMaster()(implicit roleDb: RoleDb[Master]): Unit = {
+    import roleDb._
+
+    val personFreeRepository = new PersonFreeRepository
+    val freeOp = for {
+      _ <- personFreeRepository.deleteAll()
+      _ <- personFreeRepository.insert(Person(id = 1, state = 0))
+      p <- personFreeRepository.findById(1)
+    } yield p
+    val personOpt = roleDb.roleBasedPerformIO(freeOp.transactional)
+    logger.info(s"freeRole result = $personOpt")
+  }
+
+  def freeRoleSlave()(implicit roleDb: RoleDb[Slave]): Unit = {
+    import roleDb._
+
+    val personFreeRepository = new PersonFreeRepository
+    // cause compile error
+//    val cantCompileOp = for {
+//      _ <- personFreeRepository.deleteAll()
+//      _ <- personFreeRepository.insert(Person(id = 1, state = 0))
+//      p <- personFreeRepository.findById(1)
+//    } yield p
+//     roleDb.roleBasedPerformIO(cantCompileOp.transactional)
+
+    val canCompileOp = for {
+      p <- personFreeRepository.findById(1)
+    } yield p
+    val personOpt = roleDb.roleBasedPerformIO(canCompileOp)
+
+    logger.info(s"freeRole result = $personOpt")
+  }
+
 }

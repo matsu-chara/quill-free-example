@@ -1,11 +1,11 @@
 package matsu_chara.quill.free.repo
 
-import io.getquill.{MysqlJdbcContext, SnakeCase}
 import matsu_chara.quill.free.Person
+import matsu_chara.quill.free.quill.MyDbContext
 
 class PersonRepository() {
 
-  def insert(p: Person)(implicit ctx: MysqlJdbcContext[SnakeCase]): Unit = {
+  def insert(p: Person)(implicit ctx: MyDbContext): Unit = {
     import ctx._
     val q = quote {
       query[Person].insert(lift(p))
@@ -14,7 +14,7 @@ class PersonRepository() {
     ()
   }
 
-  def findById(id: Long)(implicit ctx: MysqlJdbcContext[SnakeCase]): Option[Person] = {
+  def findById(id: Long)(implicit ctx: MyDbContext): Option[Person] = {
     import ctx._
     val q = quote {
       query[Person].filter(_.id == lift(id))
@@ -22,7 +22,7 @@ class PersonRepository() {
     run(q).headOption
   }
 
-  def deleteAll()(implicit ctx: MysqlJdbcContext[SnakeCase]): Unit = {
+  def deleteAll()(implicit ctx: MyDbContext): Unit = {
     import ctx._
     val q = quote {
       query[Person].delete
