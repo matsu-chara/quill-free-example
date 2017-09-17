@@ -27,8 +27,8 @@ object Main extends StrictLogging {
   def normal()(implicit ctx: MyDbContext): Unit = {
     val personOpt = ctx.transaction {
       personRepository.deleteAll()
-      personRepository.insert(Person(id = 1, state = 0))
-      personRepository.findById(1)
+      personRepository.insert(Person(id = 1L, state = 0))
+      personRepository.findById(1L)
     }
     logger.info(s"normal result = $personOpt")
   }
@@ -38,8 +38,8 @@ object Main extends StrictLogging {
 
     val ioOp = for {
       _ <- personFreeRepository.deleteAll()
-      _ <- personFreeRepository.insert(Person(id = 1, state = 0))
-      p <- personFreeRepository.findById(1)
+      _ <- personFreeRepository.insert(Person(id = 1L, state = 0))
+      p <- personFreeRepository.findById(1L)
     } yield p
     val personOpt = ctx.performIO(ioOp.transactional)
     logger.info(s"io result = $personOpt")
@@ -51,8 +51,8 @@ object Main extends StrictLogging {
     val personFreeRepository = new PersonFreeRepository
     val ioOp = for {
       _ <- personFreeRepository.deleteAll()
-      _ <- personFreeRepository.insert(Person(id = 1, state = 0))
-      p <- personFreeRepository.findById(1)
+      _ <- personFreeRepository.insert(Person(id = 1L, state = 0))
+      p <- personFreeRepository.findById(1L)
     } yield p
     val personOpt = roleDb.roleBasedPerformIO(ioOp.transactional)
     logger.info(s"ioRole result = $personOpt")
