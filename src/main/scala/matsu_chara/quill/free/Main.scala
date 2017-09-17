@@ -12,6 +12,7 @@ object Main extends StrictLogging {
 
     try {
       normal()
+      free()
     } finally {
       ctx.close()
     }
@@ -24,5 +25,17 @@ object Main extends StrictLogging {
       personRepository.findById(1)
     }
     logger.info(s"normal result = $personOpt")
+  }
+
+  def free()(implicit ctx: MysqlJdbcContext[SnakeCase]): Unit = {
+    val personFreeRepository = new PersonFreeRepository
+
+    val freeOp = for {
+      _ <- personFreeRepository.deleteAll()
+      _ <- personFreeRepository.insert(Person(id = 1, state = 0))
+      p <- personFreeRepository.findById(1)
+    } yield p
+    val personOpt = ctx.performIO(freeOp.transactional)
+    logger.info(s"free result = $personOpt")
   }
 }
