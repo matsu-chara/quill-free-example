@@ -1,0 +1,9 @@
+version: "3.2"
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    ports:
+      - "3306:3306" # user=root, pass=""
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
